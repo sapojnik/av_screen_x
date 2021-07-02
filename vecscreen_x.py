@@ -209,11 +209,14 @@ class Pipeline:
             f.write(cmdline)
             f.write("\n\n")
             f.flush()
+            no_proc=True
             try:
                 proc = subprocess.Popen(self.cmd, stdout=f, stderr=subprocess.STDOUT)
+                no_proc = False
                 proc.wait()
             finally:
-                if proc.returncode == None:
+                if no_proc: print(f'Exception thrown...')
+                elif proc.returncode == None:
                     print('\nAbnormal termination, stopping all processes.')
                     proc.terminate()
                 elif proc.returncode == 0:
@@ -221,7 +224,6 @@ class Pipeline:
                 else:
                     print(f'Failed, sub-command exited with rc =', proc.returncode)
                     #find_failed_step(cwllog)
-        return proc.returncode
 
 def main():
     parser = argparse.ArgumentParser(description='Run vecscreen_x.')
