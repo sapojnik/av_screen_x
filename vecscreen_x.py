@@ -226,7 +226,7 @@ class Pipeline:
                     #find_failed_step(cwllog)
 
 def main():
-    parser = argparse.ArgumentParser(description='Run vecscreen_x.')
+    parser = argparse.ArgumentParser(description='Run vecscreen_x. By default, screen against adaptors only.')
     parser.add_argument('input', nargs='?',
                         help='Input FASTA file.')
     parser.add_argument('-o', '--output', metavar='path', default='output',
@@ -235,6 +235,14 @@ def main():
                         help='Quiet mode, for scripts')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Debug mode')
+
+    parser.add_argument('--nocwl', action='store_true',
+                        help='Do not invoke cwl-runner -- execute commands directly.')
+    action_group = parser.add_mutually_exclusive_group()
+    action_group.add_argument('--prok', action='store_true',
+                        help='Also screen against contam_in_prok (for prokaryotes).')
+    action_group.add_argument('--euk', action='store_true',
+                        help='Also screen against gcontam1 (for eukaryotes).')
 
     args = parser.parse_args()
 
