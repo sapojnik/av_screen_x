@@ -21,13 +21,13 @@ set -o xtrace
 #$BLASTN -db $BLAST_DB_DIR/gcontam1 -query $SAMPLES -perc_identity 90.0 -outfmt 6 -out $OUT
 
 mkdir bin; true
-rm -f $BLAST_TAR_FILE
-wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/$BLAST_TAR_FILE
-tar -Ozxf $BLAST_TAR_FILE --wildcards "*/bin/blastn" >bin/blastn
-chmod a+x bin/blastn
+# rm -f $BLAST_TAR_FILE
+# wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/$BLAST_TAR_FILE
+# tar -Ozxf $BLAST_TAR_FILE --wildcards "*/bin/blastn" >bin/blastn
+# chmod a+x bin/blastn
 
 cp /home/sapojnik/genomebuild/bin/{ExtractAccession.pm,MegaBlastFilter} bin
 
 #tar -zcf $OUT samples/* $BLASTN -C "$(dirname "$BLAST_DB_DIR")" "$(basename "$BLAST_DB_DIR")"
 rm -f $OUT
-tar -zcf $OUT samples/* bin/* progs/* -C "$(dirname "$BLAST_DB_DIR")" "$(basename "$BLAST_DB_DIR")"
+tar -zcf $OUT --exclude="*BAK*" --exclude="*/NoMask*" samples/* bin/* progs/* CommonContaminants/* -C "$(dirname "$BLAST_DB_DIR")" "$(basename "$BLAST_DB_DIR")"

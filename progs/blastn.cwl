@@ -1,9 +1,14 @@
-cwlVersion: v1.1
+cwlVersion: v1.0
 label: "blastn"
 
 class: CommandLineTool
 baseCommand: blastn
 arguments: ['-outfmt', '6', '-perc_identity', '90.0']
+requirements:
+  EnvVarRequirement:
+    envDef:
+      BLASTDB: $(inputs.db_dir)
+
 inputs:
   query:
     type: File
@@ -13,9 +18,10 @@ inputs:
     type: string
     inputBinding:
       prefix: -db
+  db_dir: string
 
 # From https://www.commonwl.org/user_guide/rec-practices/:
-# Don’t overcomplicate your tool descriptions with options that you don’t need/use.
+# Don't overcomplicate your tool descriptions with options that you don't need/use.
 #
 #  evalue:
 #    type: float?
