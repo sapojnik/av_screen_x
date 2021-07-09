@@ -184,18 +184,57 @@ class Pipeline:
     def __init__(self, params, local_input):
         self.params = params
         self.input_file = local_input
+
+        self.cmd = []
+
         if local_input=='': self.input_file='samples/GCA_000173135.1_reduced.1.fna'
-        self.cmd = ['bin/blastn']
-        self.cmd.extend(['-db',
-                        'CommonContaminants/gcontam1',
-                        '-query',
-                        self.input_file,
-                        '-perc_identity',
-                        '90.0',
-                        '-outfmt',
-                        '6',
-                        '-out', params.outputdir + '/vecscreen.out'
-                        ])
+        if params.args.nocwl:
+          self.cmd.extend([
+            'bin/blastn',
+            '-db',
+            'CommonContaminants/gcontam1',
+            '-query',
+            self.input_file,
+            '-perc_identity',
+            '90.0',
+            '-outfmt',
+            '6',
+            '-out', params.outputdir + '/vecscreen.out'
+          ])
+        else:
+          # generate the yaml file
+          cwlfile="progs/blast_and_filter_workflow.cwl"
+          yaml_filename="autogen.yaml"
+          f=open(yaml_filename, "w")
+          f.write("fasta:\n  class: File\n  location: ")
+          f.write(self.input_file)
+          f.write("\n\nblast_db_dir: '")
+          f.write(os.getcwd() + "/CommonContaminants")
+          f.write("'\nblast_db: 'gcontam1'\n")
+          f.close()
+
+          self.cmd.extend([
+            'cwltool',
+            '--timestamps',
+            '--debug',
+            '--disable-color',
+            '--preserve-entire-environment',
+            '--outdir', 'output'
+          ])
+          # Debug flags for cwltool
+          if self.params.args.debug:
+              self.cmd.extend([
+                  '--tmpdir-prefix', '/pgap/output/debug/tmpdir/',
+                  '--leave-tmpdir',
+                  '--tmp-outdir-prefix', '/pgap/output/debug/tmp-outdir/',
+                  '--copy-outputs'])
+
+          if self.params.args.cwl_args:
+              self.cmd.extend(self.params.args.cwl_args.strip().split(" "))
+              #self.cmd.append(self.params.args.cwl_args)
+
+          self.cmd.extend([cwlfile, yaml_filename])
+
 
     def launch(self):
         cwllog = self.params.outputdir + '/vecscreen.log'
@@ -235,6 +274,9 @@ def main():
                         help='Quiet mode, for scripts')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Debug mode')
+    parser.add_argument("--cwl_args",
+                        dest='cwl_args',
+                        help='Extra CWL args.')
 
     parser.add_argument('--nocwl', action='store_true',
                         help='Do not invoke cwl-runner -- execute commands directly.')
