@@ -2,4 +2,7 @@ fasta:
   class: File
   location: samples/GCA_000173135.1_reduced.1.fna
 
-blast_db: '/home/sapojnik/vecscreen_x/CommonContaminants/gcontam1'
+blast_db_dir: '/home/sapojnik/vecscreen_x/CommonContaminants'
+blast_dbs:
+  - 'gcontam1'
+  - 'adaptors_for_euks'
