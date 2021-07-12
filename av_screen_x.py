@@ -170,8 +170,8 @@ class Setup:
         return outputdir
 
     def install_tgz(self):
-      guard_file = "vecscreen_x.tgz"
-      remote_path = f"https://s3.amazonaws.com/sapojnik-dev/vecscreen_x.tgz"
+      guard_file = "av_screen_x.tgz"
+      remote_path = f"https://s3.amazonaws.com/sapojnik-dev/av_screen_x.tgz"
       if not os.path.isfile(guard_file):
           #install_url(remote_path, self.rundir, self.args.quiet, False)
           install_url(remote_path, '.', self.args.quiet, False)
@@ -199,18 +199,20 @@ class Pipeline:
             '90.0',
             '-outfmt',
             '6',
-            '-out', params.outputdir + '/vecscreen.out'
+            '-out', params.outputdir + '/av_screen.out'
           ])
         else:
           # generate the yaml file
-          cwlfile="progs/blast_and_filter_workflow.cwl"
+          #cwlfile="progs/blast_and_filter_workflow.cwl"
+          cwlfile="progs/workflow.cwl"
           yaml_filename="autogen.yaml"
           f=open(yaml_filename, "w")
           f.write("fasta:\n  class: File\n  location: ")
           f.write(self.input_file)
           f.write("\n\nblast_db_dir: '")
           f.write(os.getcwd() + "/CommonContaminants")
-          f.write("'\nblast_db: 'gcontam1'\n")
+          #f.write("'\nblast_db: 'gcontam1'\n")
+          f.write("'\nblast_dbs:\n  - 'gcontam1'\n  - 'adaptors_for_euks'\n")
           f.close()
 
           self.cmd.extend([
@@ -237,7 +239,7 @@ class Pipeline:
 
 
     def launch(self):
-        cwllog = self.params.outputdir + '/vecscreen.log'
+        cwllog = self.params.outputdir + '/av_screen.log'
         with open(cwllog, 'a', encoding="utf-8") as f:
             # Show original command line in log
             cmdline = "Original command: " + " ".join(sys.argv)
@@ -265,7 +267,7 @@ class Pipeline:
                     #find_failed_step(cwllog)
 
 def main():
-    parser = argparse.ArgumentParser(description='Run vecscreen_x. By default, screen against adaptors only.')
+    parser = argparse.ArgumentParser(description='Run Adaptor and Vector screens. By default, screen against adaptors only.')
     parser.add_argument('input', nargs='?',
                         help='Input FASTA file.')
     parser.add_argument('-o', '--output', metavar='path', default='output',
