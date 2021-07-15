@@ -1,6 +1,0 @@
-unfiltered:
-  class: File
-  location: output/vecscreen.out
-
-out_file_name: gcontam1.hit
-
