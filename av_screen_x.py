@@ -189,22 +189,32 @@ class Pipeline:
 
         if local_input=='': self.input_file='samples/GCA_000173135.1_reduced.1.fna'
         if params.args.nocwl:
+          # self.cmd.extend([
+          #   'bin/blastn',
+          #   '-db',
+          #   'CommonContaminants/gcontam1',
+          #   '-query',
+          #   self.input_file,
+          #   '-perc_identity',
+          #   '90.0',
+          #   '-outfmt',
+          #   '6',
+          #   '-out', params.outputdir + '/av_screen.out'
+          # ])
           self.cmd.extend([
-            'bin/blastn',
-            '-db',
-            'CommonContaminants/gcontam1',
-            '-query',
+            'bin/vecscreen',
+            '-d',
+            'CommonContaminants/adaptors_for_euks',
+            '-i',
             self.input_file,
-            '-perc_identity',
-            '90.0',
-            '-outfmt',
-            '6',
-            '-out', params.outputdir + '/av_screen.out'
+            '-f',
+            '3',
+            '-o', params.outputdir + '/av_screen.out'
           ])
         else:
           # generate the yaml file
-          #cwlfile="progs/blast_and_filter_workflow.cwl"
-          cwlfile="progs/workflow.cwl"
+          #cwlfile="progs/workflow.cwl"
+          cwlfile="progs/workflow_vs.cwl"
           yaml_filename="autogen.yaml"
           f=open(yaml_filename, "w")
           f.write("fasta:\n  class: File\n  location: ")
@@ -212,7 +222,9 @@ class Pipeline:
           f.write("\n\nblast_db_dir: '")
           f.write(os.getcwd() + "/CommonContaminants")
           #f.write("'\nblast_db: 'gcontam1'\n")
-          f.write("'\nblast_dbs:\n  - 'gcontam1'\n  - 'adaptors_for_euks'\n")
+          f.write("'\nblast_dbs:\n")
+          #f.write("  - 'gcontam1'\n")
+          f.write("  - 'adaptors_for_euks'\n")
           f.close()
 
           self.cmd.extend([
@@ -252,6 +264,7 @@ class Pipeline:
             f.flush()
             no_proc=True
             try:
+                os.environ["PATH"] += os.pathsep + os.getcwd() + "/bin"
                 proc = subprocess.Popen(self.cmd, stdout=f, stderr=subprocess.STDOUT)
                 no_proc = False
                 proc.wait()
@@ -284,9 +297,9 @@ def main():
                         help='Do not invoke cwl-runner -- execute commands directly.')
     action_group = parser.add_mutually_exclusive_group()
     action_group.add_argument('--prok', action='store_true',
-                        help='Also screen against contam_in_prok (for prokaryotes).')
+                        help='(not implemented) Also screen against contam_in_prok (for prokaryotes).')
     action_group.add_argument('--euk', action='store_true',
-                        help='Also screen against gcontam1 (for eukaryotes).')
+                        help='(not implemented) Also screen against gcontam1 (for eukaryotes).')
 
     args = parser.parse_args()
 
