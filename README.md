@@ -32,11 +32,14 @@ If that directory exists, then a new directory will be created, with a version n
 
 ## Misc.
 Vectors and common contaminants screen is described in `progs/workflow.cwl`
-It may be executed afterwards as:
+It may be executed afterwards as follows:
 ```
-  cwltool --outdir output progs/workflow.cwl autogen.yaml
+  perl -pe 's/adaptors_for_euks/gcontam1/' autogen.yaml > gcontam1.yaml
+  export PATH=$PATH:`pwd`/bin
+  cwltool --outdir output progs/workflow.cwl gcontam1.yaml
 ```
-This workflow uses `bin/blastn` and `bin/MegaBlastFilter`
+This workflow uses `bin/blastn` and `bin/MegaBlastFilter`. The output file name is `combined.calls` 
+(a misnomer, since combining Adaptor and Vector screen results is not yet implemented).
 
 
 `av_screen_x.py` was derived from `pgap.py` described at:
