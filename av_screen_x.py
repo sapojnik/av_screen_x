@@ -213,18 +213,18 @@ class Pipeline:
           ])
         else:
           # generate the yaml file
-          #cwlfile="progs/workflow.cwl"
-          cwlfile="progs/workflow_vs.cwl"
+          cwlfile="progs/workflow.cwl"
+          #cwlfile="progs/workflow_vs.cwl"
           yaml_filename="autogen.yaml"
           f=open(yaml_filename, "w")
-          f.write("fasta:\n  class: File\n  location: ")
+          f.write("fasta:\n  - { class: File, location: ")
           f.write(self.input_file)
-          f.write("\n\nblast_db_dir: '")
+          f.write("}\n\nblast_db_dir: '")
           f.write(os.getcwd() + "/CommonContaminants")
           #f.write("'\nblast_db: 'gcontam1'\n")
-          f.write("'\nblast_dbs:\n")
+          f.write("'\nblast_db_a: ")
           #f.write("  - 'gcontam1'\n")
-          f.write("  - 'adaptors_for_euks'\n")
+          f.write("'adaptors_for_euks'\n")
           f.close()
 
           self.cmd.extend([
